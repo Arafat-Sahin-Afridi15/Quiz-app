@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 void main() {
   runApp(MaterialApp(
@@ -6,9 +7,8 @@ void main() {
   ));
 }
 
-
-
 class Btn {
+  // Arithmetic operations and numbers
   static const String del = "Del";
   static const String clr = "C";
   static const String per = "%";
@@ -18,7 +18,6 @@ class Btn {
   static const String subtract = "-";
   static const String calculate = "=";
   static const String dot = ".";
-
   static const String n0 = "0";
   static const String n1 = "1";
   static const String n2 = "2";
@@ -29,6 +28,15 @@ class Btn {
   static const String n7 = "7";
   static const String n8 = "8";
   static const String n9 = "9";
+
+  // Scientific functions
+  static const String sin = "sin";
+  static const String cos = "cos";
+  static const String tan = "tan";
+  static const String ln = "ln";
+  static const String log = "log";
+  static const String sqrt = "√";
+  static const String exp = "exp";
 
   static const List<String> buttonValues = [
     del,
@@ -50,11 +58,18 @@ class Btn {
     n0,
     dot,
     calculate,
+    sin,
+    cos,
+    tan,
+    ln,
+    log,
+    sqrt,
+    exp,
   ];
 }
 
 class CalculatorScreen extends StatefulWidget {
-  const CalculatorScreen({Key? key});
+  const CalculatorScreen({Key? key}) : super(key: key);
 
   @override
   _CalculatorScreenState createState() => _CalculatorScreenState();
@@ -114,16 +129,13 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     );
   }
 
-  Widget buildButton(value) {
+  Widget buildButton(String value) {
     return Padding(
       padding: const EdgeInsets.all(4.0),
       child: Material(
         color: getBtnColor(value),
         clipBehavior: Clip.hardEdge,
-        shape: OutlineInputBorder(
-          borderSide: const BorderSide(
-            color: Colors.white24,
-          ),
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(100),
         ),
         child: InkWell(
@@ -141,8 +153,46 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       ),
     );
   }
+  void handleScientificFunction(String value) {
+    if (number1.isNotEmpty) {
+      final double num1 = double.parse(number1);
+      double result;
 
-  // Handle Button Taps
+      switch (value) {
+        case Btn.sin:
+          result = sin(num1);
+          break;
+        case Btn.cos:
+          result = cos(num1);
+          break;
+        case Btn.tan:
+          result = tan(num1);
+          break;
+        case Btn.ln:
+          result = log(num1);
+          break;
+        case Btn.log:
+          result = log(num1) / log(10);
+          break;
+        case Btn.sqrt:
+          result = sqrt(num1);
+          break;
+        case Btn.exp:
+          result = exp(num1);
+          break;
+        default:
+          result = 0.0;
+          break;
+      }
+
+      setState(() {
+        number1 = result.toString();
+        operand = "";
+        number2 = "";
+      });
+    }
+  }
+
   void onBtnTap(String value) {
     if (value == Btn.del) {
       delete();
@@ -152,12 +202,13 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       convertToPercentage();
     } else if (value == Btn.calculate) {
       calculate();
-    } else {
+    } else if (Btn.buttonValues.contains(value)) {
       appendValue(value);
+    } else if (Btn.buttonValues.contains(value)) {
+      handleScientificFunction(value);
     }
   }
 
-  // Calculate Result
   void calculate() {
     if (number1.isEmpty) return;
     if (operand.isEmpty) return;
@@ -182,6 +233,22 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
         break;
       default:
     }
+    void onBtnTap(String value) {
+      if (value == Btn.del) {
+        delete();
+      } else if (value == Btn.clr) {
+        clearAll();
+      } else if (value == Btn.per) {
+        convertToPercentage();
+      } else if (value == Btn.calculate) {
+        calculate();
+      } else if ([Btn.sin, Btn.cos, Btn.tan, Btn.ln, Btn.log, Btn.sqrt, Btn.exp].contains(value)) {
+        handleScientificFunction(value);
+      } else {
+        appendValue(value);
+      }
+    }
+
 
     setState(() {
       number1 = result.toStringAsPrecision(3);
@@ -195,7 +262,6 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     });
   }
 
-  // Convert to Percentage
   void convertToPercentage() {
     if (number1.isNotEmpty && operand.isNotEmpty && number2.isNotEmpty) {
       calculate();
@@ -211,7 +277,6 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     });
   }
 
-  // Clear All
   void clearAll() {
     setState(() {
       number1 = "";
@@ -220,7 +285,6 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     });
   }
 
-  // Delete
   void delete() {
     if (number2.isNotEmpty) {
       number2 = number2.substring(0, number2.length - 1);
@@ -233,7 +297,6 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     setState(() {});
   }
 
-  // Append Value
   void appendValue(String value) {
     if (value != Btn.dot && int.tryParse(value) == null) {
       if (operand.isNotEmpty && number2.isNotEmpty) {
@@ -257,8 +320,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     setState(() {});
   }
 
-  // Button Color
-  Color getBtnColor(value) {
+  Color getBtnColor(String value) {
     return [Btn.del, Btn.clr].contains(value)
         ? Colors.blueGrey
         : [
