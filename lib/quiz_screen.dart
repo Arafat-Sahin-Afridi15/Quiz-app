@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_simple_quiz_app/question_model.dart';
 import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'calculator_screen.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -59,6 +61,8 @@ class _QuizScreenState extends State<QuizScreen> {
     bool isPassed = score >= questionList.length * 0.6;
     String title = isPassed ? "Passed" : "Failed";
 
+    saveScore(score); // Save the user's score when the quiz ends.
+
     showDialog(
       context: context,
       builder: (_) {
@@ -85,6 +89,14 @@ class _QuizScreenState extends State<QuizScreen> {
               });
             },
           ),
+          actions: <Widget>[
+            ElevatedButton(
+              child: Text("Show High Score"),
+              onPressed: () {
+                showHighScore();
+              },
+            ),
+          ],
         );
       },
     );
@@ -102,10 +114,52 @@ class _QuizScreenState extends State<QuizScreen> {
     }
   }
 
+  void showHighScore() {
+    getHighScore().then((highScore) {
+      showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            title: Text(
+              "High Score",
+              style: TextStyle(
+                fontSize: 24,
+              ),
+            ),
+            content: Text(
+              "Your high score is $highScore",
+              style: TextStyle(
+                fontSize: 18,
+              ),
+            ),
+            actions: <Widget>[
+              ElevatedButton(
+                child: Text("Close"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    });
+  }
+
+  Future<void> saveScore(int userScore) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setInt('highScore', userScore);
+  }
+
+  Future<int> getHighScore() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('highScore') ?? 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.deepPurple,
+      backgroundColor: Colors.orange,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -118,7 +172,7 @@ class _QuizScreenState extends State<QuizScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(5),
                   color: Colors.orangeAccent,
                   child: Text(
                     "Quiz App",
@@ -181,6 +235,15 @@ class _QuizScreenState extends State<QuizScreen> {
                 ),
                 _answerList(),
                 _nextButton(),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => CalculatorScreen()),
+                    );
+                  },
+                  child: Text('Open Calculator'),
+                ),
               ],
             ),
           ),

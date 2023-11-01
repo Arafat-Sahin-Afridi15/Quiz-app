@@ -84,7 +84,7 @@ List<Question> getQuestions() {
   ));
 
   list.add(Question(
-    "What is the largest mammal in the world?",
+    "What is the largest animal in the world?",
     [
       Answer("Elephant", false),
       Answer("Giraffe", false),
@@ -132,11 +132,11 @@ List<Question> getQuestions() {
     ],
   ));
   list.add(Question(
-    "What is the largest mammal in the world?",
+    "What is the small animal in the world?",
     [
       Answer("Elephant", false),
       Answer("Giraffe", false),
-      Answer("Blue Whale", true),
+      Answer("Shrews", true),
       Answer("Lion", false),
     ],
   ));

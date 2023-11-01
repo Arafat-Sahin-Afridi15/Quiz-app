@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_simple_quiz_app/quiz_screen.dart';
+import 'quiz_screen.dart';
+import 'login_screen.dart';
+import 'calculator_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,13 +12,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool userIsLoggedIn = false;
+
     return MaterialApp(
       title: 'Arafat',
       theme: ThemeData(
-        primarySwatch: Colors.teal, // Replace with your desired color
+        primarySwatch: Colors.teal,
       ),
       debugShowCheckedModeBanner: false,
-      home: QuizScreen(),
+      initialRoute: userIsLoggedIn ? '/quiz' : '/login', // Add a comma here
+      routes: {
+        '/login': (context) => LoginScreen(),
+        '/quiz': (context) => QuizScreen(),
+        '/calculator': (context) => CalculatorScreen(),
+      },
     );
   }
 }
